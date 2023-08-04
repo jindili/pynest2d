@@ -53,26 +53,9 @@ on:
             - '[0-9]+.[0-9]+.[0-9]*'
 
 jobs:
-    conan-recipe-version:
-        uses: ultimaker/cura/.github/workflows/conan-recipe-version.yml@main
-        with:
-            project_name: pynest2d
-
-    conan-package-export:
-        needs: [ conan-recipe-version ]
-        uses: ultimaker/cura/.github/workflows/conan-recipe-export.yml@main
-        with:
-            recipe_id_full: ${{ needs.conan-recipe-version.outputs.recipe_id_full }}
-            recipe_id_latest: ${{ needs.conan-recipe-version.outputs.recipe_id_latest }}
-            runs_on: 'ubuntu-20.04'
-            python_version: '3.11.x'
-            conan_logging_level: 'info'
-        secrets: inherit
-
     conan-package-create-windows:
         if: ${{ (github.event_name == 'push' && (github.ref_name == 'main' || github.ref_name == 'master' || needs.conan-recipe-version.outputs.is_release_branch)) || (github.event_name == 'workflow_dispatch' && inputs.create_binaries_windows) }}
-        needs: [ conan-recipe-version, conan-package-export ]
-
+        
         uses: ultimaker/cura/.github/workflows/conan-package-create.yml@main
         with:
             project_name: ${{ needs.conan-recipe-version.outputs.project_name }}
@@ -85,49 +68,6 @@ jobs:
             conan_logging_level: 'info'
         secrets: inherit
 
-    conan-package-create-macos:
-        if: ${{ (github.event_name == 'push' && (github.ref_name == 'main' || github.ref_name == 'master' || needs.conan-recipe-version.outputs.is_release_branch)) || (github.event_name == 'workflow_dispatch' && inputs.create_binaries_macos) }}
-        needs: [ conan-recipe-version, conan-package-export ]
 
-        uses: ultimaker/cura/.github/workflows/conan-package-create.yml@main
-        with:
-            project_name: ${{ needs.conan-recipe-version.outputs.project_name }}
-            recipe_id_full: ${{ needs.conan-recipe-version.outputs.recipe_id_full }}
-            build_id: 3
-            build_info: false
-            runs_on: 'macos-11'
-            python_version: '3.11.x'
-            conan_logging_level: 'info'
-        secrets: inherit
-        
-    conan-package-create-linux-modern:
-        if: ${{ (github.event_name == 'push' && (github.ref_name == 'main' || github.ref_name == 'master' || needs.conan-recipe-version.outputs.is_release_branch)) || (github.event_name == 'workflow_dispatch' && inputs.create_binaries_linux) }}
-        needs: [ conan-recipe-version, conan-package-export ]
-
-        uses: ultimaker/cura/.github/workflows/conan-package-create.yml@main
-        with:
-            project_name: ${{ needs.conan-recipe-version.outputs.project_name }}
-            recipe_id_full: ${{ needs.conan-recipe-version.outputs.recipe_id_full }}
-            build_id: 2
-            build_info: false
-            runs_on: 'ubuntu-22.04'
-            python_version: '3.11.x'
-            conan_logging_level: 'info'
-        secrets: inherit
-
-    conan-package-create-linux:
-        if: ${{ (github.event_name == 'push' && (github.ref_name == 'main' || github.ref_name == 'master' || needs.conan-recipe-version.outputs.is_release_branch)) || (github.event_name == 'workflow_dispatch' && inputs.create_binaries_linux) }}
-        needs: [ conan-recipe-version, conan-package-export ]
-
-        uses: ultimaker/cura/.github/workflows/conan-package-create.yml@main
-        with:
-            project_name: ${{ needs.conan-recipe-version.outputs.project_name }}
-            recipe_id_full: ${{ needs.conan-recipe-version.outputs.recipe_id_full }}
-            build_id: 1
-            build_info: false
-            runs_on: 'ubuntu-20.04'
-            python_version: '3.11.x'
-            conan_logging_level: 'info'
-        secrets: inherit
 
 
